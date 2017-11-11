@@ -161,7 +161,10 @@ void uncompress_pack(const struct CompressQuat *_src, struct cqQuaternion *out) 
     out->w =  quat[3];
 }
 
-
+void uncompress_packN(const struct CompressQuat *_src, struct cqQuaternion *out) {
+    uncompress_pack(_src, out);
+    cq_normalize(out);
+}
 
 
 

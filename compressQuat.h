@@ -59,6 +59,8 @@ void cq_toEuler(const struct cqQuaternion *q, struct cqFloat3 *_euler);
 // improved by pre-multiplying each componenent by sqrt(2).
 void compress_pack(const struct cqQuaternion *_src, struct CompressQuat *out);
 void uncompress_pack(const struct CompressQuat *_src, struct cqQuaternion *out);
+// normalize
+void uncompress_packN(const struct CompressQuat *_src, struct cqQuaternion *out);
 
 #ifdef __cplusplus
 }

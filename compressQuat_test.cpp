@@ -81,17 +81,27 @@ TEST(compressQuat, QuaternionCompress) {
                 compress_pack(&test_quat, &cquat);
 
                 cqQuaternion unquat {};
+                cqQuaternion unquatN {};
                 cq_identity(&unquat);
+                cq_identity(&unquatN);
                 uncompress_pack(&cquat, &unquat);
+                uncompress_packN(&cquat, &unquatN);
 
-                auto check = cq_compare(&unquat, &test_quat, 2.0f) == cqTRUE;
+                auto check = cq_compare(&unquat, &test_quat, 2.0f) == cqTRUE &&
+                        cq_compare(&unquatN, &test_quat, 2.5f) == cqTRUE;
+
                 const float diff_w = test_quat.x * unquat.x +
                         test_quat.y * unquat.y +
                         test_quat.z * unquat.z +
                         test_quat.w * unquat.w;
+                const float normalize_diff_w = test_quat.x * unquatN.x +
+                                               test_quat.y * unquatN.y +
+                                               test_quat.z * unquatN.z +
+                                               test_quat.w * unquatN.w;
+
                 // Converts w back to an angle.
                 const float angle = 2.f * acosf(fminf(fabsf(diff_w), 1.f));
-
+                const float normalize_angle = 2.f * acosf(fminf(fabsf(normalize_diff_w), 1.f));
                 EXPECT_TRUE(check) << " Compress Quat : x= " +  std::to_string(test_quat.x) +
                                     " y= " + std::to_string(test_quat.y) +
                                     " z= " + std::to_string(test_quat.z) +
@@ -100,7 +110,8 @@ TEST(compressQuat, QuaternionCompress) {
                                     " y= " + std::to_string(unquat.y) +
                                     " z= " + std::to_string(unquat.z) +
                                     " w= " + std::to_string(unquat.w) +
-                                    " angle= " + std::to_string(angle);
+                                    " angle= " + std::to_string(angle) +
+                                    " angle(normalize)= " + std::to_string(normalize_angle);
             }
         }
     }

@@ -51,11 +51,6 @@ cqBOOL cq_compare(const struct cqQuaternion *_a, const struct cqQuaternion *_b, 
 void cq_fromEuler(const struct cqFloat3 *_euler, struct cqQuaternion *out);
 void cq_toEuler(const struct cqQuaternion *q, struct cqFloat3 *_euler);
 
-// linear interpolation of quaternion _a and _b with coefficient _f.
-void cq_lerp(const struct cqQuaternion *_a, const struct cqQuaternion *_b, float _f, struct cqQuaternion *out);
-// spherical interpolation of quaternion _a and _b with coefficient _f.
-void cq_slerp(const struct cqQuaternion *_a, const struct cqQuaternion *_b, float _f, struct cqQuaternion *out);
-
 // compresses quaternion
 // The 3 smallest components of the quaternion are quantized to 16 bits
 // integers, while the largest is recomputed thanks to quaternion normalization

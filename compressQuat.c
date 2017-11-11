@@ -6,7 +6,7 @@
 #define cq_Sqrt2 1.4142135623730950488016887242097f
 #define cq_NormalizationToleranceSq 1e-6f
 
-inline int32_t clamp(int32_t _a, int32_t _x, int32_t _b) {
+static inline int32_t clamp(int32_t _a, int32_t _x, int32_t _b) {
     int32_t min = _x < _b ? _x : _b;
     return (min < _a ? _a : min);
 }
@@ -99,68 +99,6 @@ void cq_toEuler(const struct cqQuaternion *_q, struct cqFloat3 *_euler) {
     }
 }
 
-void cq_lerp(const struct cqQuaternion *_a, const struct cqQuaternion *_b, float _f, struct cqQuaternion *out) {
-    const struct cqQuaternion lerp = {
-            (_b->x - _a->x) * _f + _a->x,
-            (_b->y - _a->y) * _f + _a->y,
-            (_b->z - _a->z) * _f + _a->z,
-            (_b->w - _a->w) * _f + _a->w
-    };
-
-    const float sq_len =
-            lerp.x * lerp.x + lerp.y * lerp.y + lerp.z * lerp.z + lerp.w * lerp.w;
-    const float inv_len = 1.f / sqrtf(sq_len);
-
-    out->x = lerp.x * inv_len;
-    out->y = lerp.y * inv_len;
-    out->z = lerp.z * inv_len;
-    out->w = lerp.w * inv_len;
-}
-
-void cq_slerp(const struct cqQuaternion *_a, const struct cqQuaternion *_b, float _f, struct cqQuaternion *out) {
-    struct cqQuaternion a = *_a;
-    struct cqQuaternion b = *_b;
-
-    if (!cq_isNormalize(&a)) {
-        cq_normalize(&a);
-    }
-
-    if (!cq_isNormalize(&b)) {
-        cq_normalize(&b);
-    }
-
-    // Calculate angle between them.
-    float cos_half_theta = a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
-
-    // If _a=_b or _a=-_b then theta = 0 and we can return _a.
-    if (fabsf(cos_half_theta) >= .999f) {
-        *out = a;
-        return;
-    }
-
-    // Calculate temporary values.
-    const float half_theta = acosf(cos_half_theta);
-    const float sin_half_theta = sqrtf(1.f - cos_half_theta * cos_half_theta);
-
-    // If theta = pi then result is not fully defined, we could rotate around any
-    // axis normal to _a or _b.
-    if (sin_half_theta < .001f) {
-        out->x = (a.x + b.x) * .5f;
-        out->y = (a.y + b.y) * .5f;
-        out->z = (a.z + b.z) * .5f;
-        out->w = (a.w + b.w) * .5f;
-        return;
-    }
-
-    const float ratio_a = sinf((1.f - _f) * half_theta) / sin_half_theta;
-    const float ratio_b = sinf(_f * half_theta) / sin_half_theta;
-
-    // Calculate Quaternion.
-    out->x = ratio_a * a.x + ratio_b * b.x;
-    out->y = ratio_a * a.y + ratio_b * b.y;
-    out->z = ratio_a * a.z + ratio_b * b.z;
-    out->w = ratio_a * a.w + ratio_b * b.w;
-}
 
 void compress_pack(const struct cqQuaternion *_src, struct CompressQuat *out) {
     const float quat[4] = {_src->x, _src->y, _src->z, _src->w};
@@ -194,9 +132,9 @@ void compress_pack(const struct cqQuaternion *_src, struct CompressQuat *out) {
     const int16_t l_b = (const int16_t) (clamp(-maxAbsRage, b, maxAbsRage));
     const int16_t l_c = (const int16_t) (clamp(-maxAbsRage, c, maxAbsRage));
 
-    out->a = (uint16_t) (l_a & 0x4000);
-    out->b = (uint16_t) (l_b & 0x4000);
-    out->c = (uint16_t) (l_c & 0x4000);
+    out->a = (uint16_t) (l_a & 0x3FFF);
+    out->b = (uint16_t) (l_b & 0x3FFF);
+    out->c = (uint16_t) (l_c & 0x3FFF);
 
     out->sign_a = (uint16_t)(l_a < 0 ? 1 : 0);
     out->sign_b = (uint16_t)(l_b < 0 ? 1 : 0);

@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.8)
 project(compressQuat)
 
 set(CMAKE_C_STANDARD 99)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(SOURCE_FILES compressQuat.c compressQuat.h)
 add_library(compressQuat ${SOURCE_FILES})
@@ -39,6 +41,6 @@ if (CMAKE_VERSION VERSION_LESS 3.8)
 endif()
 
 # Now simply link against gtest or gtest_main as needed. Eg
-add_executable(example compressQuat_test.cpp)
-target_link_libraries(example gtest_main)
+add_executable(example compressQuat_test.cpp linmath.h)
+target_link_libraries(example gtest_main compressQuat)
 add_test(NAME example_test COMMAND example)
